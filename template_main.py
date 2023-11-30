@@ -69,7 +69,7 @@ def clust(mat, k):
     '''
 
     
-    kmeans = KMeans(n_clusters=k)
+    kmeans = KMeans(n_clusters=k,n_init=1)
     pred = kmeans.fit_predict(mat)
 
     
@@ -106,7 +106,7 @@ def cross_validation(mat, k, num_iterations):
     avg_ari = np.mean(aris)
     std_nmi = np.std(nmis)
     std_ari = np.std(aris)
-    print(f'NMI: {avg_nmi:.2f} \nARI: {avg_ari:.2f} \nSTD_NMI: {std_nmi} \n \nSTD_ARI: std_ari')
+    print(f'NMI_AVG: {avg_nmi:.2f} \nARI_AVG: {avg_ari:.2f} \nSTD_NMI: {std_nmi}  \nSTD_ARI: {std_ari:.2f}')
     
 
 def clust_spherical_kmeans(mat, k):
@@ -146,10 +146,12 @@ for method in methods:
     ari_score = adjusted_rand_score(pred, labels)
     ari_score_sk = adjusted_rand_score(pred_sk, labels)
     # Print results
-    print(f'Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
-    print(f'Using Kmeans Clustering, Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
-    print(f'Using SphericalKmeans Clustering, Method: {method}\nNMI: {nmi_score_sk:.2f} \nARI: {ari_score_sk:.2f}\n')
-    print(f'Using Kmeans Clustering, Method: {method}\n {cross_validation(red_emb, k, 100)}')
+    print(f"\n----------------------------------{method}--------------------------------\n")
+    print(f'Using SphericalKmeans Clustering,\nNMI: {nmi_score_sk:.2f} \nARI: {ari_score_sk:.2f}\n')
+    print("\n-----------------------------\n")
+    print(f'Using Kmeans Clustering cross validation : \n')
+    cross_validation(red_emb, k, 100)
+    print("\n-----------------------------\n")
     visualize(red_emb,pred,method)
       
 
