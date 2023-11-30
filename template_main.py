@@ -2,7 +2,9 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_score
 from sentence_transformers import SentenceTransformer
 import numpy as np
-
+from sklearn.cluster import KMeans
+import prince
+import pandas as pd 
 
 def dim_red(mat, p, method):
     '''
@@ -17,7 +19,9 @@ def dim_red(mat, p, method):
         red_mat : NxP list such that p<<m
     '''
     if method=='ACP':
-        red_mat = mat[:,:p]
+        mat=pd.DataFrame(mat)
+        acp = prince.PCA(n_components=p)
+        red_mat = acp.fit_transform(mat)
         
     elif method=='AFC':
         red_mat = mat[:,:p]
@@ -44,7 +48,9 @@ def clust(mat, k):
         pred : list of predicted labels
     '''
     
-    pred = np.random.randint(k, size=len(mat))
+    kmeans = KMeans(n_clusters=k)
+    kmeans.fit(mat)
+    pred = kmeans.predict(mat)
     
     return pred
 
@@ -62,7 +68,7 @@ embeddings = model.encode(corpus)
 methods = ['ACP', 'AFC', 'UMAP']
 for method in methods:
     # Perform dimensionality reduction
-    red_emb = dim_red(embeddings, 20, method)
+    red_emb = dim_red(embeddings, 2, method)
 
     # Perform clustering
     pred = clust(red_emb, k)
