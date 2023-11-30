@@ -31,11 +31,11 @@ Partie docker :
 
 -On mets l'image dans le docker hub :
 
-   -On se connecte au git hub  : docker login
-   
-   -docker tag docker_image_examen:tag1 allzahra/rep_name:tag1
-   
-   -docker push allzahra/rep_name:tag1
+     -On se connecte au git hub  : docker login
+     
+     -docker tag docker_image_examen:tag1 lamisbouf/image_examen_data_eng:tagname
+     
+     -docker push lamisbouf/image_examen_data_eng:tagname
 
 
 
