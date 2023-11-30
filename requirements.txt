@@ -2,5 +2,5 @@ scikit-learn
 sentence-transformers
 umap
 prince
-matplotlibs
+matplotlib
 

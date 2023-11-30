@@ -42,12 +42,12 @@ def dim_red(mat, p, method):
     
     return red_mat
 
-def visualize(data,labels): 
+def visualize(data,labels,mehtod): 
     x = data[:,0]
     y = data[:,1]
     plt.figure(figsize=(15,10))
     plt.scatter(x, y, c=pred)  # Vous pouvez changer 'viridis' à d'autres cartes de couleur (colormaps)
-    plt.title('Scatter Plot des Deux deux première dimensions ')
+    plt.title(f"Scatter Plot des Deux deux première dimensions avec la méthode {method}" )
     plt.xlabel('Première Colonne')
     plt.ylabel('Deuxième Colonne')
     
@@ -94,5 +94,5 @@ for method in methods:
 
     # Print results
     print(f'Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
-    visualize(red_emb,pred)
+    visualize(red_emb,pred,method)
         
