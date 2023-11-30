@@ -7,6 +7,7 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 import prince
 import pandas as pd 
+from sklearn.cluster import SpectralClustering
 import matplotlib.pyplot as plt
 
 
@@ -74,6 +75,23 @@ def clust(mat, k):
     
     return pred
 
+def clust_spherical_kmeans(mat, k):
+    '''
+    Perform clustering
+
+    Input:
+    -----
+        mat : input list 
+        k : number of cluster
+    Output:
+    ------
+        pred : list of predicted labels
+    '''
+    spherical_kmeans = SpectralClustering(n_clusters=3, affinity='nearest_neighbors')
+    pred= spherical_kmeans.fit_predict(mat)
+    
+    return pred
+
 # import data
 ng20 = fetch_20newsgroups(subset='test')
 corpus = ng20.data[:2000]
@@ -92,12 +110,14 @@ for method in methods:
 
     # Perform clustering
     pred = clust(red_emb, k)
-
+    pred_sk=clust_spherical_kmeans(red_emb,k)
     # Evaluate clustering results
     nmi_score = normalized_mutual_info_score(pred, labels)
+    nmi_score_sk = normalized_mutual_info_score(pred_sk, labels)
     ari_score = adjusted_rand_score(pred, labels)
-
+    ari_score_sk = adjusted_rand_score(pred_sk, labels)
     # Print results
-    print(f'Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
+    print(f'Using Kmeans Clustering, Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
+    print(f'Using SphericalKmeans Clustering, Method: {method}\nNMI: {nmi_score_sk:.2f} \nARI: {ari_score_sk:.2f}\n')
     visualize(red_emb,pred)
         
