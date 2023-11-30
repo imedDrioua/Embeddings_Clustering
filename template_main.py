@@ -58,6 +58,40 @@ def clust(mat, k):
 
     
     return pred
+def cross_validation(mat, k, num_iterations):
+    '''
+    Execute clustering function multiple times with different initializations
+
+    Input:
+    -----
+        mat : input list 
+        k : number of clusters
+        num_iterations : number of times to run the clustering function
+    Output:
+    ------
+        avg_nmi : average normalized mutual info score
+        avg_ari : average adjusted rand score
+        std_nmi : standard deviation of NMI scores
+        std_ari : standard deviation of ARI scores
+    '''
+
+    nmis = []
+    aris = []
+
+    for _ in range(num_iterations):
+        pred = clust(mat, k)
+        nmi_score = normalized_mutual_info_score(pred, labels)
+        ari_score = adjusted_rand_score(pred, labels)
+
+        nmis.append(nmi_score)
+        aris.append(ari_score)
+
+    avg_nmi = np.mean(nmis)
+    avg_ari = np.mean(aris)
+    std_nmi = np.std(nmis)
+    std_ari = np.std(aris)
+    print(f'NMI: {avg_nmi:.2f} \nARI: {avg_ari:.2f} \nSTD_NMI: {std_nmi} \n \nSTD_ARI: std_ari')
+    
 
 # import data
 ng20 = fetch_20newsgroups(subset='test')
@@ -84,3 +118,4 @@ for method in methods:
 
     # Print results
     print(f'Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
+    print(f'Method: {method}\n {cross_validation(red_emb, k, 100)}')
