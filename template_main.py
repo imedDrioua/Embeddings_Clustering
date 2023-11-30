@@ -69,6 +69,7 @@ def cross_validation(mat, k, num_iterations,labels):
     std_ari = np.std(aris)
     return avg_nmi, avg_ari, std_nmi, std_ari
 
+
 # Route principale
 @app.route('/')
 def index():
