@@ -107,4 +107,4 @@ def process_data():
                            avg_ari=avg_ari, std_nmi=std_nmi, std_ari=std_ari, plot_url=plot_url)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0",port="5000")
