@@ -1,3 +1,5 @@
 scikit-learn
 sentence-transformers
 import umap
+prince
+
