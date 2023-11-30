@@ -27,7 +27,7 @@ def dim_red(mat, p, method):
         red_mat = mat[:,:p]
         
     elif method=='UMAP':
-        red_mat = mat[:,:p]
+        red_mat = umap.UMAP(n_components=p).fit_transform(mat)
         
     else:
         raise Exception("Please select one of the three methods : APC, AFC, UMAP")
@@ -49,8 +49,7 @@ def clust(mat, k):
     '''
     
     kmeans = KMeans(n_clusters=k)
-    kmeans.fit(mat)
-    pred = kmeans.predict(mat)
+    pred = kmeans.fit_predict(mat)
     
     return pred
 
