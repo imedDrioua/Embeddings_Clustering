@@ -106,7 +106,7 @@ def cross_validation(mat, k, num_iterations):
     avg_ari = np.mean(aris)
     std_nmi = np.std(nmis)
     std_ari = np.std(aris)
-    print(f'NMI: {avg_nmi:.2f} \nARI: {avg_ari:.2f} \nSTD_NMI: {std_nmi} \n \nSTD_ARI: std_ari')
+    print(f'NMI: {avg_nmi:.2f} \nARI: {avg_ari:.2f} \nSTD_NMI: {std_nmi} \n \nSTD_ARI: {std_ari}')
     
 
 def clust_spherical_kmeans(mat, k):
