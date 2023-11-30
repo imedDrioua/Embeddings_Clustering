@@ -2,10 +2,14 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_score
 from sentence_transformers import SentenceTransformer
 import numpy as np
+import umap
 from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 import prince
 import pandas as pd 
+import matplotlib.pyplot as plt
+
+
 
 
 def dim_red(mat, p, method):
@@ -23,7 +27,7 @@ def dim_red(mat, p, method):
     if method=='ACP':
         mat=pd.DataFrame(mat)
         acp = prince.PCA(n_components=p)
-        red_mat = acp.fit_transform(mat)
+        red_mat = acp.fit_transform(mat).values
         
     elif method=='TSNE':
         p=3
@@ -38,7 +42,18 @@ def dim_red(mat, p, method):
     
     return red_mat
 
-
+def visualize(data,labels): 
+    x = data[:,0]
+    y = data[:,1]
+    plt.figure(figsize=(15,10))
+    plt.scatter(x, y, c=pred)  # Vous pouvez changer 'viridis' à d'autres cartes de couleur (colormaps)
+    plt.title('Scatter Plot des Deux deux première dimensions ')
+    plt.xlabel('Première Colonne')
+    plt.ylabel('Deuxième Colonne')
+    
+    # Affichage du plot
+    plt.show()
+        
 def clust(mat, k):
     '''
     Perform clustering
@@ -84,3 +99,5 @@ for method in methods:
 
     # Print results
     print(f'Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
+    visualize(red_emb,pred)
+        
