@@ -18,3 +18,19 @@ python template_main.py
 
 Résultats : 
 Les résultats de clustering sont imprimés dans la console, et des visualisations en 2D des clusters sont affichées pour chaque méthode de réduction de dimensionnalité.# examen_data_eng
+
+On  a fait une sauvegarde des données (des embeddings) dans un fichier dataset.csv et avons enlevé SentenceTransformer des requirements
+
+
+Partie docker :
+-On a crée le dossier venv
+-On a écrit le Dockerfile
+-On a lancé la création de l'image docker avec docker build -t docker_image_examen:tag1
+-On mets l'image dans le docker hub :
+   -On se connecte au git hub  : docker login
+   -docker tag docker_image_examen:tag1 allzahra/rep_name:tag1
+   -docker push allzahra/rep_name:tag1
+
+
+
+
