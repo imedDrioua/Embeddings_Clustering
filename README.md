@@ -3,7 +3,9 @@ Ce script Python template_main.py réalise le clustering de documents textuels e
 Fonctionnalités et Chargement des données : 
 Les données sont chargées à partir du dataset 20 Newsgroups via scikit-learn. 
 Embedding de Textes : Les embeddings des documents sont générés à l'aide du modèle SentenceTransformer. 
-Réduction de Dimensionnalité : Les embeddings textuels sont réduits à 2 dimensions en utilisant l'une des techniques : ACP, UMAP, t-SNE. 
+
+ Réduction de Dimensionnalité : Les embeddings textuels sont réduits à 2 dimensions en utilisant l'une des techniques : ACP, UMAP, t-SNE.
+ 
  Clustering : L'algorithme K-means et Spherical Kmeans sont appliqués sur les données réduites pour former des clusters.
  Évaluation : Les résultats de clustering sont évalués à l'aide des scores NMI (Normalized Mutual Information) et ARI (Adjusted Rand Index).
 
