@@ -7,6 +7,7 @@ from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
 import prince
 import pandas as pd 
+from sklearn.cluster import SpectralClustering
 import matplotlib.pyplot as plt
 
 
@@ -73,6 +74,57 @@ def clust(mat, k):
 
     
     return pred
+def cross_validation(mat, k, num_iterations):
+    '''
+    Execute clustering function multiple times with different initializations
+
+    Input:
+    -----
+        mat : input list 
+        k : number of clusters
+        num_iterations : number of times to run the clustering function
+    Output:
+    ------
+        avg_nmi : average normalized mutual info score
+        avg_ari : average adjusted rand score
+        std_nmi : standard deviation of NMI scores
+        std_ari : standard deviation of ARI scores
+    '''
+
+    nmis = []
+    aris = []
+
+    for _ in range(num_iterations):
+        pred = clust(mat, k)
+        nmi_score = normalized_mutual_info_score(pred, labels)
+        ari_score = adjusted_rand_score(pred, labels)
+
+        nmis.append(nmi_score)
+        aris.append(ari_score)
+
+    avg_nmi = np.mean(nmis)
+    avg_ari = np.mean(aris)
+    std_nmi = np.std(nmis)
+    std_ari = np.std(aris)
+    print(f'NMI: {avg_nmi:.2f} \nARI: {avg_ari:.2f} \nSTD_NMI: {std_nmi} \n \nSTD_ARI: std_ari')
+    
+
+def clust_spherical_kmeans(mat, k):
+    '''
+    Perform clustering
+
+    Input:
+    -----
+        mat : input list 
+        k : number of cluster
+    Output:
+    ------
+        pred : list of predicted labels
+    '''
+    spherical_kmeans = SpectralClustering(n_clusters=3, affinity='nearest_neighbors')
+    pred= spherical_kmeans.fit_predict(mat)
+    
+    return pred
 
 # import data
 embeddings = pd.read_csv("dataset.csv")
@@ -87,12 +139,17 @@ for method in methods:
 
     # Perform clustering
     pred = clust(red_emb, k)
-
+    pred_sk=clust_spherical_kmeans(red_emb,k)
     # Evaluate clustering results
     nmi_score = normalized_mutual_info_score(pred, labels)
+    nmi_score_sk = normalized_mutual_info_score(pred_sk, labels)
     ari_score = adjusted_rand_score(pred, labels)
-
+    ari_score_sk = adjusted_rand_score(pred_sk, labels)
     # Print results
     print(f'Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
+    print(f'Using Kmeans Clustering, Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
+    print(f'Using SphericalKmeans Clustering, Method: {method}\nNMI: {nmi_score_sk:.2f} \nARI: {ari_score_sk:.2f}\n')
+    print(f'Using Kmeans Clustering, Method: {method}\n {cross_validation(red_emb, k, 100)}')
     visualize(red_emb,pred,method)
-        
+      
+
