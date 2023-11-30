@@ -43,12 +43,12 @@ def dim_red(mat, p, method):
     
     return red_mat
 
-def visualize(data,labels): 
+def visualize(data,labels,mehtod): 
     x = data[:,0]
     y = data[:,1]
     plt.figure(figsize=(15,10))
     plt.scatter(x, y, c=pred)  # Vous pouvez changer 'viridis' à d'autres cartes de couleur (colormaps)
-    plt.title('Scatter Plot des Deux deux première dimensions ')
+    plt.title(f"Scatter Plot des Deux deux première dimensions avec la méthode {method}" )
     plt.xlabel('Première Colonne')
     plt.ylabel('Deuxième Colonne')
     
@@ -69,7 +69,7 @@ def clust(mat, k):
     '''
 
     
-    kmeans = KMeans(n_clusters=k)
+    kmeans = KMeans(n_clusters=k,n_init=1)
     pred = kmeans.fit_predict(mat)
 
     
@@ -106,7 +106,11 @@ def cross_validation(mat, k, num_iterations):
     avg_ari = np.mean(aris)
     std_nmi = np.std(nmis)
     std_ari = np.std(aris)
+<<<<<<< HEAD
     print(f'NMI: {avg_nmi:.2f} \nARI: {avg_ari:.2f} \nSTD_NMI: {std_nmi} \n \nSTD_ARI: {std_ari}')
+=======
+    print(f'NMI_AVG: {avg_nmi:.2f} \nARI_AVG: {avg_ari:.2f} \nSTD_NMI: {std_nmi}  \nSTD_ARI: {std_ari:.2f}')
+>>>>>>> ff750116b706abbbf68adb681a6ee14782329e7b
     
 
 def clust_spherical_kmeans(mat, k):
@@ -127,14 +131,9 @@ def clust_spherical_kmeans(mat, k):
     return pred
 
 # import data
-ng20 = fetch_20newsgroups(subset='test')
-corpus = ng20.data[:2000]
-labels = ng20.target[:2000]
+embeddings = pd.read_csv("dataset.csv")
+labels = embeddings.pop("label")
 k = len(set(labels))
-
-# embedding
-model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-embeddings = model.encode(corpus)
 
 # Perform dimensionality reduction and clustering for each method
 methods = ['ACP', 'TSNE', 'UMAP']
@@ -151,8 +150,12 @@ for method in methods:
     ari_score = adjusted_rand_score(pred, labels)
     ari_score_sk = adjusted_rand_score(pred_sk, labels)
     # Print results
-    print(f'Using Kmeans Clustering, Method: {method}\nNMI: {nmi_score:.2f} \nARI: {ari_score:.2f}\n')
-    print(f'Using SphericalKmeans Clustering, Method: {method}\nNMI: {nmi_score_sk:.2f} \nARI: {ari_score_sk:.2f}\n')
-    print(f'Method: {method}\n {cross_validation(red_emb, k, 100)}')
-    visualize(red_emb,pred)
+    print(f"\n----------------------------------{method}--------------------------------\n")
+    print(f'Using SphericalKmeans Clustering,\nNMI: {nmi_score_sk:.2f} \nARI: {ari_score_sk:.2f}\n')
+    print("\n-----------------------------\n")
+    print(f'Using Kmeans Clustering cross validation : \n')
+    cross_validation(red_emb, k, 100)
+    print("\n-----------------------------\n")
+    visualize(red_emb,pred,method)
       
+
