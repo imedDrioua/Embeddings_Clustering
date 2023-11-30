@@ -44,7 +44,8 @@ def clust(mat, k):
         pred : list of predicted labels
     '''
     
-    pred = np.random.randint(k, size=len(mat))
+    kmeans = KMeans(n_clusters=k)
+    pred = kmeans.fit_predict(mat)
     
     return pred
 
