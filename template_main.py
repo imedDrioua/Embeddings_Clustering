@@ -4,6 +4,9 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
+import prince
+import pandas as pd 
+
 
 def dim_red(mat, p, method):
     '''
@@ -18,7 +21,9 @@ def dim_red(mat, p, method):
         red_mat : NxP list such that p<<m
     '''
     if method=='ACP':
-        red_mat = mat[:,:p]
+        mat=pd.DataFrame(mat)
+        acp = prince.PCA(n_components=p)
+        red_mat = acp.fit_transform(mat)
         
     elif method=='TSNE':
         p=3
@@ -26,7 +31,7 @@ def dim_red(mat, p, method):
         red_mat= tsne.fit_transform(mat)
         
     elif method=='UMAP':
-        red_mat = mat[:,:p]
+        red_mat = umap.UMAP(n_components=p).fit_transform(mat)
         
     else:
         raise Exception("Please select one of the three methods : APC, AFC, UMAP")
@@ -46,8 +51,11 @@ def clust(mat, k):
     ------
         pred : list of predicted labels
     '''
-    kmeans = KMeans(n_clusters=k, random_state=42)
-    pred= kmeans.fit_predict(mat)
+
+    
+    kmeans = KMeans(n_clusters=k)
+    pred = kmeans.fit_predict(mat)
+
     
     return pred
 
@@ -65,7 +73,7 @@ embeddings = model.encode(corpus)
 methods = ['ACP', 'TSNE', 'UMAP']
 for method in methods:
     # Perform dimensionality reduction
-    red_emb = dim_red(embeddings, 20, method)
+    red_emb = dim_red(embeddings, 2, method)
 
     # Perform clustering
     pred = clust(red_emb, k)
