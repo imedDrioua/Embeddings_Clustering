@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px auto;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+        img {
+            max-width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Results for {{ method }}</h2>
+    <p>NMI Score: {{ nmi_score }}</p>
+    <p>ARI Score: {{ ari_score }}</p>
+    <p>SphericalKmeans NMI Score: {{ nmi_score_sk }}</p>
+    <p>SphericalKmeans ARI Score: {{ ari_score_sk }}</p>
+    <p>KMeans Cross-Validation Avg NMI: {{ avg_nmi }}</p>
+    <p>KMeans Cross-Validation Avg ARI: {{ avg_ari }}</p>
+    <p>KMeans Cross-Validation Std NMI: {{ std_nmi }}</p>
+    <p>KMeans Cross-Validation Std ARI: {{ std_ari }}</p>
+    <img src="data:image/png;base64,{{ plot_url }}" alt="Plot">
+</body>
+</html>

@@ -1,6 +1,6 @@
 scikit-learn
-sentence-transformers
-umap
+umap-learn
 prince
 matplotlib
+Flask
 

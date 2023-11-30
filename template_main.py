@@ -1,161 +1,110 @@
-from sklearn.datasets import fetch_20newsgroups
-from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_score
-from sentence_transformers import SentenceTransformer
+from flask import Flask, render_template, request
 import numpy as np
-import umap
+from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-from sklearn.cluster import KMeans
+from umap import UMAP
 import prince
 import pandas as pd 
 from sklearn.cluster import SpectralClustering
+from sklearn.cluster import KMeans
+from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_score
 import matplotlib.pyplot as plt
+from io import BytesIO
+import base64
 
+app = Flask(__name__)
 
-
-
+# Fonctions pour effectuer la réduction de dimension et le clustering
 def dim_red(mat, p, method):
-    '''
-    Perform dimensionality reduction
-
-    Input:
-    -----
-        mat : NxM list 
-        p : number of dimensions to keep 
-    Output:
-    ------
-        red_mat : NxP list such that p<<m
-    '''
-    if method=='ACP':
-        mat=pd.DataFrame(mat)
+    if method == 'ACP':
+        mat = pd.DataFrame(mat)
         acp = prince.PCA(n_components=p)
         red_mat = acp.fit_transform(mat).values
-        
-    elif method=='TSNE':
-        p=3
+    elif method == 'TSNE':
+        p = 3
         tsne = TSNE(n_components=p, random_state=42)
-        red_mat= tsne.fit_transform(mat)
-        
-    elif method=='UMAP':
-        red_mat = umap.UMAP(n_components=p).fit_transform(mat)
-        
+        red_mat = tsne.fit_transform(mat)
+    elif method == 'UMAP':
+        red_mat = UMAP(n_components=p).fit_transform(mat)
     else:
-        raise Exception("Please select one of the three methods : APC, AFC, UMAP")
-    
+        raise Exception("Veuillez choisir l'une des trois méthodes : ACP, TSNE, UMAP")
     return red_mat
 
-def visualize(data,labels,mehtod): 
-    x = data[:,0]
-    y = data[:,1]
-    plt.figure(figsize=(15,10))
-    plt.scatter(x, y, c=pred)  # Vous pouvez changer 'viridis' à d'autres cartes de couleur (colormaps)
-    plt.title(f"Scatter Plot des Deux deux première dimensions avec la méthode {method}" )
+def visualize(data, labels, method):
+    x = data[:, 0]
+    y = data[:, 1]
+    plt.figure(figsize=(15, 10))
+    plt.scatter(x, y, c=labels)
+    plt.title(f"Scatter Plot des Deux premières dimensions avec la méthode {method}")
     plt.xlabel('Première Colonne')
     plt.ylabel('Deuxième Colonne')
-    
-    # Affichage du plot
-    plt.show()
-        
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    plot_url = base64.b64encode(img.getvalue()).decode()
+    return plot_url
+
 def clust(mat, k):
-    '''
-    Perform clustering
-
-    Input:
-    -----
-        mat : input list 
-        k : number of cluster
-    Output:
-    ------
-        pred : list of predicted labels
-    '''
-
-    
-    kmeans = KMeans(n_clusters=k,n_init=1)
+    kmeans = KMeans(n_clusters=k, n_init=1)
     pred = kmeans.fit_predict(mat)
-
-    
     return pred
-def cross_validation(mat, k, num_iterations):
-    '''
-    Execute clustering function multiple times with different initializations
 
-    Input:
-    -----
-        mat : input list 
-        k : number of clusters
-        num_iterations : number of times to run the clustering function
-    Output:
-    ------
-        avg_nmi : average normalized mutual info score
-        avg_ari : average adjusted rand score
-        std_nmi : standard deviation of NMI scores
-        std_ari : standard deviation of ARI scores
-    '''
+def clust_spherical_kmeans(mat, k):
+    spherical_kmeans = SpectralClustering(n_clusters=3, affinity='nearest_neighbors')
+    pred = spherical_kmeans.fit_predict(mat)
+    return pred
 
+def cross_validation(mat, k, num_iterations,labels):
     nmis = []
     aris = []
-
     for _ in range(num_iterations):
         pred = clust(mat, k)
         nmi_score = normalized_mutual_info_score(pred, labels)
         ari_score = adjusted_rand_score(pred, labels)
-
         nmis.append(nmi_score)
         aris.append(ari_score)
-
     avg_nmi = np.mean(nmis)
     avg_ari = np.mean(aris)
     std_nmi = np.std(nmis)
     std_ari = np.std(aris)
+    return avg_nmi, avg_ari, std_nmi, std_ari
 
-    
 
-    print(f'NMI_AVG: {avg_nmi:.2f} \nARI_AVG: {avg_ari:.2f} \nSTD_NMI: {std_nmi}  \nSTD_ARI: {std_ari:.2f}')
+# Route principale
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    
+# Route pour le traitement des données
+@app.route('/process_data', methods=['POST'])
+def process_data():
+    method = request.form['method']
 
-def clust_spherical_kmeans(mat, k):
-    '''
-    Perform clustering
+    # Importation des données
+    embeddings = pd.read_csv("dataset.csv")
+    labels = embeddings.pop("label")
+    k = len(set(labels))
 
-    Input:
-    -----
-        mat : input list 
-        k : number of cluster
-    Output:
-    ------
-        pred : list of predicted labels
-    '''
-    spherical_kmeans = SpectralClustering(n_clusters=3, affinity='nearest_neighbors')
-    pred= spherical_kmeans.fit_predict(mat)
-    
-    return pred
-
-# import data
-embeddings = pd.read_csv("dataset.csv")
-labels = embeddings.pop("label")
-k = len(set(labels))
-
-# Perform dimensionality reduction and clustering for each method
-methods = ['ACP', 'TSNE', 'UMAP']
-for method in methods:
-    # Perform dimensionality reduction
+    # Réduction de dimension et clustering
     red_emb = dim_red(embeddings, 2, method)
-
-    # Perform clustering
     pred = clust(red_emb, k)
-    pred_sk=clust_spherical_kmeans(red_emb,k)
-    # Evaluate clustering results
+    pred_sk = clust_spherical_kmeans(red_emb, k)
+
+    # Évaluation des résultats de clustering
     nmi_score = normalized_mutual_info_score(pred, labels)
     nmi_score_sk = normalized_mutual_info_score(pred_sk, labels)
     ari_score = adjusted_rand_score(pred, labels)
     ari_score_sk = adjusted_rand_score(pred_sk, labels)
-    # Print results
-    print(f"\n----------------------------------{method}--------------------------------\n")
-    print(f'Using SphericalKmeans Clustering,\nNMI: {nmi_score_sk:.2f} \nARI: {ari_score_sk:.2f}\n')
-    print("\n-----------------------------\n")
-    print(f'Using Kmeans Clustering cross validation : \n')
-    cross_validation(red_emb, k, 100)
-    print("\n-----------------------------\n")
-    visualize(red_emb,pred,method)
-      
 
+    # Cross-validation pour KMeans
+    avg_nmi, avg_ari, std_nmi, std_ari = cross_validation(red_emb, k, 100,labels)
+
+    # Visualisation et sauvegarde du plot
+    plot_url = visualize(red_emb, pred, method)
+
+    return render_template('result.html', method=method, nmi_score=nmi_score, ari_score=ari_score,
+                           nmi_score_sk=nmi_score_sk, ari_score_sk=ari_score_sk, avg_nmi=avg_nmi,
+                           avg_ari=avg_ari, std_nmi=std_nmi, std_ari=std_ari, plot_url=plot_url)
+
+if __name__ == '__main__':
+    app.run(debug=True)

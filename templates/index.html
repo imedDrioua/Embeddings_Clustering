@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Method</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20% auto;
+        }
+        form {
+            display: inline-block;
+            text-align: left;
+        }
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <form action="/process_data" method="post">
+        <label for="method">Choose a method:</label>
+        <select name="method" id="method">
+            <option value="ACP">ACP</option>
+            <option value="TSNE">TSNE</option>
+            <option value="UMAP">UMAP</option>
+        </select>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
