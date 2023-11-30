@@ -3,6 +3,7 @@ from sklearn.metrics.cluster import normalized_mutual_info_score, adjusted_rand_
 from sentence_transformers import SentenceTransformer
 import numpy as np
 from sklearn.manifold import TSNE
+from sklearn.cluster import KMeans
 
 def dim_red(mat, p, method):
     '''
@@ -45,8 +46,8 @@ def clust(mat, k):
     ------
         pred : list of predicted labels
     '''
-    
-    pred = np.random.randint(k, size=len(mat))
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    pred= kmeans.fit_predict(mat)
     
     return pred
 
